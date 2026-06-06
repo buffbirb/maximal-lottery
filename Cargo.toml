@@ -1,5 +1,5 @@
 [package]
-name = "voting-systems"
+name = "maximal-lottery"
 version = "0.1.0"
 edition = "2024"
 

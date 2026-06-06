@@ -1,7 +1,7 @@
-use voting_systems::ballot::{CompactBallot, PairPreference};
-use voting_systems::margins::tally_margins;
-use voting_systems::maximal_lottery::maximal_lottery;
-use voting_systems::types::PreferenceProfile;
+use maximal_lottery::ballot::{CompactBallot, PairPreference};
+use maximal_lottery::margins::tally_margins;
+use maximal_lottery::maximal_lottery::maximal_lottery;
+use maximal_lottery::types::PreferenceProfile;
 
 fn main() {
     // Three voters, three candidates (0, 1, 2), Condorcet cycle.

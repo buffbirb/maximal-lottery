@@ -50,6 +50,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
 
 [[package]]
+name = "maximal-lottery"
+version = "0.1.0"
+dependencies = [
+ "bitvec",
+ "num-bigint",
+ "num-rational",
+ "num-traits",
+ "rand",
+ "thiserror",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -193,18 +205,6 @@ name = "unicode-ident"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
-
-[[package]]
-name = "voting-systems"
-version = "0.1.0"
-dependencies = [
- "bitvec",
- "num-bigint",
- "num-rational",
- "num-traits",
- "rand",
- "thiserror",
-]
 
 [[package]]
 name = "wasi"
