@@ -1,9 +1,4 @@
 _: {
-  # https://devenv.sh/integrations/codespaces-devcontainer/
-  devcontainer = {
-    enable = true;
-  };
-
   # https://devenv.sh/git-hooks/
   git-hooks = {
     hooks = {
