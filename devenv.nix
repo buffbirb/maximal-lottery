@@ -1,4 +1,9 @@
 _: {
+  # https://devenv.sh/integrations/codespaces-devcontainer/
+  devcontainer = {
+    enable = true;
+  };
+
   # https://devenv.sh/git-hooks/
   git-hooks = {
     hooks = {
@@ -31,7 +36,9 @@ _: {
 
   # https://devenv.sh/languages/
   languages = {
-    rust.enable = true;
+    rust = {
+      enable = true;
+    };
   };
 
   # See full reference at https://devenv.sh/reference/options/
