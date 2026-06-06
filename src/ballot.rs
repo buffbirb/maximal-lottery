@@ -103,7 +103,17 @@ impl CompactBallot {
 
     #[inline]
     pub fn set_preference(&mut self, i: usize, j: usize, n: usize, pref: PairPreference) {
-        let idx = pair_index(i, j, n) * 2;
+        let (left, right, swap) = if i < j { (i, j, false) } else { (j, i, true) };
+        let pref = if swap {
+            match pref {
+                PairPreference::Left => PairPreference::Right,
+                PairPreference::Right => PairPreference::Left,
+                other => other,
+            }
+        } else {
+            pref
+        };
+        let idx = pair_index(left, right, n) * 2;
         let bits = pref as u8;
 
         match self {

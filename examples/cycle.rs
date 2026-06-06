@@ -1,11 +1,10 @@
 use maximal_lottery::ballot::{CompactBallot, PairPreference};
+use maximal_lottery::display::{print_ballot, print_lottery, print_margins};
 use maximal_lottery::margins::tally_margins;
 use maximal_lottery::maximal_lottery::{LotteryMethod, maximal_lottery};
 use maximal_lottery::types::PreferenceProfile;
 
 fn main() {
-    // Three voters, three candidates (0, 1, 2), Condorcet cycle.
-    // Each voter's preferences expressed as explicit pairwise comparisons.
     let n = 3;
 
     // Voter 1: 0 > 1, 0 > 2, 1 > 2
@@ -18,7 +17,7 @@ fn main() {
         n,
     );
 
-    // Voter 2: 1 > 0, 1 > 2, 2 > 0
+    // Voter 2: 0 < 1, 0 < 2, 1 > 2
     let ballot2 = CompactBallot::from_pairs(
         &[
             (0, 1, PairPreference::Right),
@@ -28,7 +27,7 @@ fn main() {
         n,
     );
 
-    // Voter 3: 2 > 1, 2 > 0, 0 > 1
+    // Voter 3: 0 > 1, 0 < 2, 1 < 2
     let ballot3 = CompactBallot::from_pairs(
         &[
             (0, 1, PairPreference::Left),
@@ -41,17 +40,15 @@ fn main() {
     let ballots = vec![ballot1, ballot2, ballot3];
     let profile = PreferenceProfile::new(n, ballots);
 
-    let margins = tally_margins(&profile.ballots, profile.n);
-    println!("Margin matrix:");
-    for row in &margins {
-        println!("  {:?}", row);
+    println!("Ballots:\n");
+    for (i, ballot) in profile.ballots.iter().enumerate() {
+        print_ballot(ballot, n, &format!("Ballot {}:", i + 1));
     }
+
+    let margins = tally_margins(&profile.ballots, profile.n);
+    print_margins(&margins);
 
     let lottery = maximal_lottery(&margins, LotteryMethod::Centroid)
         .expect("failed to compute maximal lottery");
-
-    println!("\nMaximal lottery:");
-    for (i, prob) in lottery.iter().enumerate() {
-        println!("  Candidate {}: {}", i, prob);
-    }
+    print_lottery(&lottery, &margins);
 }
