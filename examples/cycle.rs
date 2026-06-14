@@ -1,54 +1,56 @@
-use maximal_lottery::ballot::{CompactBallot, PairPreference};
+use maximal_lottery::ballot::{PairPreference, PairwiseBallot};
 use maximal_lottery::display::{print_ballot, print_lottery, print_margins};
-use maximal_lottery::margins::tally_margins;
-use maximal_lottery::maximal_lottery::{LotteryMethod, maximal_lottery};
-use maximal_lottery::types::PreferenceProfile;
+use maximal_lottery::prelude::*;
 
 fn main() {
     let n = 3;
+    let c = Candidate;
 
-    // Voter 1: 0 > 1, 0 > 2, 1 > 2
-    let ballot1 = CompactBallot::from_pairs(
+    // Voter 1: 0 > 1 > 2
+    let ballot1 = PairwiseBallot::from_pairs(
         &[
-            (0, 1, PairPreference::Left),
-            (0, 2, PairPreference::Left),
-            (1, 2, PairPreference::Left),
+            (c(0), c(1), PairPreference::Left),
+            (c(0), c(2), PairPreference::Left),
+            (c(1), c(2), PairPreference::Left),
         ],
         n,
-    );
+    )
+    .unwrap();
 
-    // Voter 2: 0 < 1, 0 < 2, 1 > 2
-    let ballot2 = CompactBallot::from_pairs(
+    // Voter 2: 1 > 2 > 0
+    let ballot2 = PairwiseBallot::from_pairs(
         &[
-            (0, 1, PairPreference::Right),
-            (0, 2, PairPreference::Right),
-            (1, 2, PairPreference::Left),
+            (c(0), c(1), PairPreference::Right),
+            (c(0), c(2), PairPreference::Right),
+            (c(1), c(2), PairPreference::Left),
         ],
         n,
-    );
+    )
+    .unwrap();
 
-    // Voter 3: 0 > 1, 0 < 2, 1 < 2
-    let ballot3 = CompactBallot::from_pairs(
+    // Voter 3: 2 > 0 > 1
+    let ballot3 = PairwiseBallot::from_pairs(
         &[
-            (0, 1, PairPreference::Left),
-            (0, 2, PairPreference::Right),
-            (1, 2, PairPreference::Right),
+            (c(0), c(1), PairPreference::Left),
+            (c(0), c(2), PairPreference::Right),
+            (c(1), c(2), PairPreference::Right),
         ],
         n,
-    );
+    )
+    .unwrap();
 
-    let ballots = vec![ballot1, ballot2, ballot3];
-    let profile = PreferenceProfile::new(n, ballots);
+    let profile = PreferenceProfile::try_new(vec![ballot1, ballot2, ballot3]).unwrap();
 
     println!("Ballots:\n");
-    for (i, ballot) in profile.ballots.iter().enumerate() {
-        print_ballot(ballot, n, &format!("Ballot {}:", i + 1));
+    for (i, ballot) in profile.ballots().iter().enumerate() {
+        print_ballot(ballot, &format!("Ballot {}:", i + 1));
     }
 
-    let margins = tally_margins(&profile.ballots, profile.n);
+    let margins = profile.tally_margins();
     print_margins(&margins);
 
-    let lottery = maximal_lottery(&margins, LotteryMethod::Centroid)
+    let lottery = CentroidSolver
+        .solve(&margins)
         .expect("failed to compute maximal lottery");
     print_lottery(&lottery, &margins);
 }

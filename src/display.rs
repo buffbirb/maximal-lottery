@@ -1,8 +1,11 @@
-use crate::ballot::{CompactBallot, PairPreference};
-use crate::maximal_lottery::condorcet_winner;
-use crate::types::Lottery;
+//! Helper functions for printing ballots, margins, and lotteries.
 
-pub fn print_ballot(ballot: &CompactBallot, n: usize, label: &str) {
+use crate::ballot::{Ballot, PairPreference};
+use crate::profile::{Candidate, Lottery, MarginMatrix};
+
+/// Print a ballot as a grid of pairwise comparisons.
+pub fn print_ballot(ballot: &impl Ballot, label: &str) {
+    let n = ballot.n_candidates();
     println!("{}", label);
     print!("    ");
     for j in 0..n {
@@ -15,7 +18,7 @@ pub fn print_ballot(ballot: &CompactBallot, n: usize, label: &str) {
             if i == j {
                 print!("  - ");
             } else {
-                match ballot.preference(i, j, n) {
+                match ballot.preference(Candidate(i), Candidate(j)) {
                     PairPreference::Left => print!("  > "),
                     PairPreference::Right => print!("  < "),
                     PairPreference::Abstain => print!("  . "),
@@ -27,20 +30,25 @@ pub fn print_ballot(ballot: &CompactBallot, n: usize, label: &str) {
     println!();
 }
 
-pub fn print_margins(margins: &[Vec<i64>]) {
+/// Print a margin matrix.
+pub fn print_margins(margins: &MarginMatrix) {
     println!("Margin matrix:");
-    for row in margins {
+    for row in margins.margins() {
         println!("  {:?}", row);
     }
 }
 
-pub fn print_lottery(lottery: &Lottery, margins: &[Vec<i64>]) {
+/// Print the result of a maximal-lottery computation.
+///
+/// If the margin matrix has a Condorcet winner, that candidate is printed.
+/// Otherwise, the lottery probabilities are printed.
+pub fn print_lottery(lottery: &Lottery, margins: &MarginMatrix) {
     println!();
-    if let Some(winner) = condorcet_winner(margins) {
+    if let Some(winner) = margins.condorcet_winner() {
         println!("Condorcet winner: candidate {}", winner);
     } else {
         println!("Maximal lottery:");
-        for (i, prob) in lottery.iter().enumerate() {
+        for (i, prob) in lottery.probabilities().iter().enumerate() {
             println!("  Candidate {}: {}", i, prob);
         }
     }
