@@ -1,4 +1,4 @@
-use maximal_lottery::ballot::{PairPreference, PairwiseBallot};
+use maximal_lottery::ballot::RankedBallot;
 use maximal_lottery::display::{print_ballot, print_lottery, print_margins};
 use maximal_lottery::prelude::*;
 
@@ -7,37 +7,13 @@ fn main() {
     let c = Candidate;
 
     // Voter 1: 0 > 1 > 2
-    let ballot1 = PairwiseBallot::from_pairs(
-        &[
-            (c(0), c(1), PairPreference::Left),
-            (c(0), c(2), PairPreference::Left),
-            (c(1), c(2), PairPreference::Left),
-        ],
-        n,
-    )
-    .unwrap();
+    let ballot1 = RankedBallot::total(&[c(0), c(1), c(2)], n).unwrap();
 
     // Voter 2: 1 > 2 > 0
-    let ballot2 = PairwiseBallot::from_pairs(
-        &[
-            (c(0), c(1), PairPreference::Right),
-            (c(0), c(2), PairPreference::Right),
-            (c(1), c(2), PairPreference::Left),
-        ],
-        n,
-    )
-    .unwrap();
+    let ballot2 = RankedBallot::total(&[c(1), c(2), c(0)], n).unwrap();
 
     // Voter 3: 2 > 0 > 1
-    let ballot3 = PairwiseBallot::from_pairs(
-        &[
-            (c(0), c(1), PairPreference::Left),
-            (c(0), c(2), PairPreference::Right),
-            (c(1), c(2), PairPreference::Right),
-        ],
-        n,
-    )
-    .unwrap();
+    let ballot3 = RankedBallot::total(&[c(2), c(0), c(1)], n).unwrap();
 
     let profile = PreferenceProfile::try_new(vec![ballot1, ballot2, ballot3]).unwrap();
 
