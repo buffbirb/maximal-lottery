@@ -2,13 +2,20 @@ name: CI
 
 on:
   pull_request:
+    branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions: {}
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  ci:
+    name: CI
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -16,6 +23,10 @@ jobs:
 
     permissions:
       contents: read
+
+    defaults:
+      run:
+        shell: devenv shell bash -- --noprofile --norc -e -o pipefail {0}
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -28,11 +39,32 @@ jobs:
         with:
           name: devenv
 
-      - name: Install devenv.sh
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('devenv.lock', 'devenv.nix', 'devenv.yaml') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+
+      - name: Install devenv
+        shell: bash
         run: nix profile install nixpkgs#devenv
 
-      - name: Build shell and run hooks
+      - name: Build devenv shell
+        shell: bash
+        run: devenv shell -- true
+
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          cmd-format: devenv shell -- {0}
+
+      - name: Run devenv tests
+        shell: bash
         run: devenv test
 
-      - name: Run tests
-        run: devenv shell cargo test
+      - name: Run Rust tests
+        run: cargo test --all-features
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check formatting
+        run: cargo fmt --check
