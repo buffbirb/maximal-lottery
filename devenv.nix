@@ -5,16 +5,22 @@ _: {
       actionlint = {
         enable = true;
       };
-      clippy = {
-        enable = true;
-      };
       check-yaml = {
         enable = true;
       };
       deadnix = {
         enable = true;
       };
+      end-of-file-fixer = {
+        enable = true;
+        excludes = [
+          "\\.lock$"
+        ];
+      };
       nixfmt = {
+        enable = true;
+      };
+      rustfmt = {
         enable = true;
       };
       shellcheck = {
@@ -23,8 +29,14 @@ _: {
       statix = {
         enable = true;
       };
-      rustfmt = {
+      taplo = {
         enable = true;
+      };
+      trim-trailing-whitespace = {
+        enable = true;
+        excludes = [
+          "\\.lock$"
+        ];
       };
     };
   };
