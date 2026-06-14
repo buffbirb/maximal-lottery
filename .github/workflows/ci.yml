@@ -46,7 +46,7 @@ jobs:
 
       - name: Install devenv
         shell: bash
-        run: nix profile install nixpkgs#devenv
+        run: nix profile add nixpkgs#devenv
 
       - name: Build devenv shell
         shell: bash
