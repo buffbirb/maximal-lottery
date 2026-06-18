@@ -58,7 +58,7 @@ jobs:
 
       - name: Run devenv tests
         shell: bash
-        run: devenv test
+        run: devenv test -v --no-tui
 
       - name: Run Rust tests
         run: cargo test --all-features
