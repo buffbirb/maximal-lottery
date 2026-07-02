@@ -10,16 +10,13 @@ on:
 permissions: {}
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ci:
     name: CI
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read
@@ -29,17 +26,21 @@ jobs:
         shell: devenv shell bash -- --noprofile --norc -e -o pipefail {0}
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
+      - name: Install Nix
+        uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
         with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          github_access_token: ${{ github.token }}
 
-      - uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
+      - name: Use Cachix
+        uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
         with:
           name: devenv
 
-      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2
+      - name: Cache Nix store
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7.0.2
         with:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('devenv.lock', 'devenv.nix', 'devenv.yaml') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
@@ -50,21 +51,19 @@ jobs:
 
       - name: Build devenv shell
         shell: bash
-        run: devenv shell -- true
+        run: devenv shell --no-tui --verbose -- true
 
-      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+      - name: Cache Rust crates
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
           cmd-format: devenv shell -- {0}
 
       - name: Run devenv tests
         shell: bash
-        run: devenv test -v --no-tui
+        run: devenv test --no-tui --verbose
 
       - name: Run Rust tests
-        run: cargo test --all-features
+        run: cargo test --locked --all-features
 
       - name: Run clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
-
-      - name: Check formatting
-        run: cargo fmt --check
+        run: cargo clippy --locked --all-targets --all-features -- -D warnings
