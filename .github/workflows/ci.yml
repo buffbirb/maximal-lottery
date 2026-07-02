@@ -23,7 +23,7 @@ jobs:
 
     defaults:
       run:
-        shell: devenv shell bash -- --noprofile --norc -e -o pipefail {0}
+        shell: devenv --quiet shell -- bash --noprofile --norc -e -o pipefail {0}
 
     steps:
       - name: Checkout ${{ github.repository }}
@@ -51,16 +51,16 @@ jobs:
 
       - name: Build devenv shell
         shell: bash
-        run: devenv shell --no-tui --verbose -- true
+        run: devenv --verbose shell -- true
 
       - name: Cache Rust crates
         uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
-          cmd-format: devenv shell -- {0}
+          cmd-format: devenv --quiet shell -- {0}
 
       - name: Run devenv tests
         shell: bash
-        run: devenv test --no-tui --verbose
+        run: devenv --verbose test
 
       - name: Run Rust tests
         run: cargo test --locked --all-features
