@@ -12,4 +12,5 @@ devenv.local.yaml
 
 # Added by cargo
 
+/Cargo.lock
 /target
