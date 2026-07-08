@@ -58,7 +58,8 @@ jobs:
 
       - name: Verify tag matches package version
         run: |
-          crate_version="$(cargo pkgid | cut -d '@' -f2)"
+          crate_version="$(cargo metadata --no-deps --format-version=1 \
+            | python3 -c 'import json,sys; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "maximal-lottery"))')"
           tag_version="${GITHUB_REF_NAME#v}"
           if [[ "$crate_version" != "$tag_version" ]]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $crate_version"
