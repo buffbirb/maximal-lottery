@@ -1,6 +1,6 @@
 [package]
 name = "maximal-lottery"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "A Rust library for computing maximal lotteries from preference profiles."
 license = "MIT OR Apache-2.0"
