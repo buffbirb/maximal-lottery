@@ -13,7 +13,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 bitvec = "1"
-num-bigint = "0.4"
+num-bigint = "0.5"
 num-rational = { version = "0.4", features = ["num-bigint"] }
 num-traits = "0.2"
 thiserror = "2"
